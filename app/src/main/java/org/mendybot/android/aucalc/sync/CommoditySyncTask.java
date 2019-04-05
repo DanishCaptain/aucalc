@@ -5,10 +5,29 @@ import android.app.job.JobService;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+
 import org.mendybot.android.aucalc.model.CommoditiesModel;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
+
 public class CommoditySyncTask extends AsyncTask<JobParameters, Void, JobParameters> {
+    private static final String CALL = "http://services.packetizer.com/spotprices?f=json";
     private final JobService jobService;
+    private boolean running;
 
     public CommoditySyncTask(JobService jobService) {
         this.jobService = jobService;
@@ -16,7 +35,7 @@ public class CommoditySyncTask extends AsyncTask<JobParameters, Void, JobParamet
 
     @Override
     protected JobParameters doInBackground(JobParameters... params) {
-        CommoditiesModel.getInstance().setAuStrikeOzt(1294.57);
+        CommoditySyncTool.getInstance().executeNow();
         return params[0];
     }
 
@@ -24,4 +43,6 @@ public class CommoditySyncTask extends AsyncTask<JobParameters, Void, JobParamet
     protected void onPostExecute(JobParameters jobParameters) {
         jobService.jobFinished(jobParameters, false);
     }
+
 }
+
